@@ -1,0 +1,83 @@
+release:
+  github:
+    owner: obalunenko
+    name: coverbadger
+
+gomod:
+  proxy: true
+  # If proxy is true, use these environment variables when running `go mod` commands (namely, `go mod tidy`).
+  # Defaults to `os.Environ()`.
+  env:
+    - GOPROXY=https://proxy.golang.org,direct
+    - GOSUMDB=sum.golang.org
+    - GOPRIVATE=example.com/blah
+  # Which Go binary to use.
+  # Defaults to `go`.
+  gobinary: go
+env:
+  - GO111MODULE=on
+  - GOPROXY=https://goproxy.io
+before:
+  hooks:
+    - go mod tidy -v
+
+builds:
+  - id: cli
+    binary: coverbadger
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - 386
+      - amd64
+      - arm
+      - arm64
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    env:
+      - CGO_ENABLED=0
+    main: ./cmd/coverbadger
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X github.com/obalunenko/version.version={{ .Env.BUILD_VERSION }} -X github.com/obalunenko/version.commit={{ .Env.BUILD_COMMIT }} -X github.com/obalunenko/version.builddate={{ .Env.BUILD_DATE }} -X github.com/obalunenko/version.shortcommit={{ .Env.BUILD_SHORTCOMMIT }} -X github.com/obalunenko/version.appname={{ .Env.BUILD_APPNAME }}
+
+archives:
+  - id: cli
+    builds:
+      - cli
+    format: tar.gz
+    wrap_in_directory: true
+    format_overrides:
+      - goos: windows
+        format: zip
+    replacements:
+      amd64: 64-bit
+      386: 32-bit
+      darwin: macOS
+      linux: Tux
+    name_template: "{{ .Binary }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    files:
+      - LICENSE
+      - README.md
+checksum:
+  name_template: "{{ .ProjectName }}-{{ .Version }}-checksums.txt"
+
+snapshot:
+  name_template: SNAPSHOT-{{ .Commit }}
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^dev:"
+      - "README"
+      - "^readme"
+      - "^scripts"
+      - "scripts:"
+      - Merge pull request
+      - Merge branch
+      - Rebase on master
+      - "^Makefile"
+      - "goreleaser"
