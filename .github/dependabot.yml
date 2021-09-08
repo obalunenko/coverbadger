@@ -40,7 +40,6 @@ updates:
       - "obalunenko"
     reviewers:
       - "obalunenko"
-      - "sivchin"
     commit-message:
       prefix: "chore"
       include: "scope"
