@@ -9,11 +9,11 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[badgeStyleUnknown-0]
-	_ = x[BadgeStylePlastic-1]
-	_ = x[BadgeStyleFlat-2]
-	_ = x[BadgeStyleFlatSquare-3]
-	_ = x[BadgeStyleForTheBadge-4]
-	_ = x[BadgeStyleSocial-5]
+	_ = x[badgeStylePlastic-1]
+	_ = x[badgeStyleFlat-2]
+	_ = x[badgeStyleFlatSquare-3]
+	_ = x[badgeStyleForTheBadge-4]
+	_ = x[badgeStyleSocial-5]
 	_ = x[badgeStyleSentinel-6]
 }
 

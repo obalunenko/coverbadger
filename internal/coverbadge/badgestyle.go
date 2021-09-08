@@ -8,13 +8,15 @@ import "fmt"
 type badgeStyle uint
 
 const (
-	badgeStyleUnknown     badgeStyle = iota // unknown
-	BadgeStylePlastic                       // plastic
-	BadgeStyleFlat                          // flat
-	BadgeStyleFlatSquare                    // flat-square
-	BadgeStyleForTheBadge                   // for-the-badge
-	BadgeStyleSocial                        // social
-	badgeStyleSentinel                      // sentinel
+	badgeStyleUnknown badgeStyle = iota // unknown
+
+	badgeStylePlastic     // plastic
+	badgeStyleFlat        // flat
+	badgeStyleFlatSquare  // flat-square
+	badgeStyleForTheBadge // for-the-badge
+	badgeStyleSocial      // social
+
+	badgeStyleSentinel // sentinel
 )
 
 var badgeStyleDict = func() map[string]badgeStyle {
