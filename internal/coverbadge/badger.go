@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Params holds Badger parameters.
 type Params struct {
 	BadgeStyle     string
 	UpdateMdFiles  string
@@ -12,6 +13,7 @@ type Params struct {
 	ImgExt         string
 }
 
+// Badger updates cover badge according tp Params.
 func Badger(p Params) error {
 	style, err := parseBadgeStyle(p.BadgeStyle)
 	if err != nil {

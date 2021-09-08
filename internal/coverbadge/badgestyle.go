@@ -42,6 +42,7 @@ func (b badgeStyle) IsValid() bool {
 	return b > badgeStyleUnknown && b < badgeStyleSentinel
 }
 
+// BadgeStyleNames returns list of valid badgeStyle names.
 func BadgeStyleNames() []string {
 	res := make([]string, 0, badgeStyleSentinel-1-1)
 
