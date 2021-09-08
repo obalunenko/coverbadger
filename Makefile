@@ -34,7 +34,7 @@ help:
 	} \
 	{ lastLine = $$0 }' $(MAKEFILE_LIST)
 
-build:
+compile:
 	./scripts/compile.sh
 .PHONY: build
 
