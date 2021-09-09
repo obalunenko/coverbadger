@@ -1,4 +1,8 @@
 ![coverbadger-tag-do-not-edit](https://img.shields.io/badge/coverage-55.56%25-brightgreen?longCache=true&style=flat)
+[![GO](https://img.shields.io/github/go-mod/go-version/obalunenko/coverbadger)](https://golang.org/doc/devel/release.html)
+[![Go Report Card](https://goreportcard.com/badge/github.com/obalunenko/coverbadger)](https://goreportcard.com/report/github.com/obalunenko/coverbadger)
+[![Latest release artifacts](https://img.shields.io/github/v/release/obalunenko/coverbadger)](https://github.com/obalunenko/coverbadger/releases/latest)
+[![License](https://img.shields.io/github/license/obalunenko/coverbadger)](/LICENSE)
 
 # coverbadger
 Generate coverage badge images for Markdown files using Go
