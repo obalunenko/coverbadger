@@ -14,13 +14,15 @@ To install the executable (ensure your $PATH contains $GOPATH/bin):
 ```
 go install github.com/obalunenko/coverbadger
 ```
+Or download from relases [![Latest release artifacts](https://img.shields.io/github/v/release/obalunenko/coverbadger)](https://github.com/obalunenko/coverbadger/releases/latest)
 
 ## Quick Start:
 
 <hr>
-Either enter a Markdown file that does not already exist, or a Markdown file (like your README.md) that contains the following tag somewhere in the contents:
+Either enter a Markdown file that does not already exist, or a Markdown file (like your README.md) that you want to update with coverage badge info.
+After executing of `coverbadger` the following badge will be added
 
-!`[coverbadger-tag-do-not-edit]()`
+!`[coverbadger-tag-do-not-edit](<badge_url>)`
 
 This tag will be replaced by the image for your coverage badge.
 
