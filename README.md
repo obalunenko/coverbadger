@@ -39,3 +39,7 @@ Try running:
 coverbadger -h
 ```
 
+## Credits
+
+@jpoles1 - as an author of original tool [gopherbadger](https://github.com/jpoles1/gopherbadger)
+
