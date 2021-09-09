@@ -1,0 +1,4 @@
+linguist-language=Go
+*.sh linguist-vendored
+*.yml inguist-vendored
+Makefile linguist-vendored
