@@ -14,7 +14,7 @@ SCRIPT_NAME="$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
 echo "${SCRIPT_NAME} is running... "
 
 # Get new tags from the remote
-git fetch --tags
+git fetch --tags -f
 
 export BUILD_COMMIT=$(git rev-parse HEAD)
 export BUILD_SHORTCOMMIT=$(git rev-parse --short HEAD)
