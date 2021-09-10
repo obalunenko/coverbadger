@@ -84,7 +84,7 @@ menu
 NEW_TAG=${NEW_VERSION}
 
 TAG_COMMIT=$(git rev-list --tags --max-count=1)
-CURRENT_TAG=$(git describe --tags "${TAG_COMMIT}"
+CURRENT_TAG=$(git describe --tags "${TAG_COMMIT}")
 CHANGELOG="$(git log --pretty=format:"%s" HEAD..."${CURRENT_TAG}")"
 
 
