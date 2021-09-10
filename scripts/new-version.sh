@@ -81,24 +81,32 @@ git pull
 ## Sem ver update menu
 menu
 
-if [[ "${NEW_VERSION}" == "" ]]; then
-  NEW_VERSION="v1.0.0"
-fi
+NEW_TAG=${NEW_VERSION}
 
-echo ${NEW_VERSION}
+TAG_COMMIT=$(git rev-list --tags --max-count=1)
+CURRENT_TAG=$(git describe --tags "${TAG_COMMIT}"
+CHANGELOG="$(git log --pretty=format:"%s" HEAD..."${CURRENT_TAG}")"
 
-message="version ${NEW_VERSION}"
-ADD="version"
-read -r -n 1 -p "y?:" userok
-echo ""
-if [[ "$userok" == "y" ]]; then
-  read -r -n 1 -p "Update commit message?: y/n" userok
-  echo ""
-  if [[ "$userok" == "y" ]]; then
-    read -r -p "Message: " message
-    ADD="."
-    echo ""
-  fi
-  echo ${NEW_VERSION} >version && git add ${ADD} && git commit -m "$message" && git tag -a ${NEW_VERSION} -m ${NEW_VERSION} && git push --tags && git push
-fi
-echo
+
+echo "New version is: ${NEW_TAG}"
+while true; do
+  echo "Is it ok? (:y)?:"
+  read -r yn
+  case $yn in
+  [Yy]*)
+    echo git tag -a "${NEW_TAG}" -m "${CHANGELOG}" &&
+      echo git push --tags
+
+    break
+    ;;
+  [Nn]*)
+    echo "Cancel"
+    break
+    ;;
+  *)
+    echo "Please answer yes or no."
+    ;;
+  esac
+done
+
+echo "${SCRIPT_NAME} done."
