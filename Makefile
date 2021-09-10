@@ -38,7 +38,7 @@ compile:
 	./scripts/compile.sh
 .PHONY: build
 
-run: test-cover build
+run: test-cover compile
 	./scripts/run.sh
 .PHONY: run
 
