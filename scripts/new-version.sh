@@ -94,7 +94,9 @@ while true; do
   read -r yn
   case $yn in
   [Yy]*)
-    echo git tag -a "${NEW_TAG}" -m "${CHANGELOG}" && git push --tags
+
+    git tag -a "${NEW_TAG}" -m "${CHANGELOG}" && \
+     git push --tags
 
     break
     ;;
