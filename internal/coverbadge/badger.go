@@ -27,11 +27,18 @@ func Badger(p Params) error {
 
 	cov := p.ManualCoverage
 
-	if p.UpdateMdFiles != "" {
-		for _, filepath := range strings.Split(p.UpdateMdFiles, ",") {
-			if err := b.writeBadgeToMd(filepath, cov); err != nil {
-				return fmt.Errorf("write badge to markdown[%s]: %w", filepath, err)
-			}
+	if p.UpdateMdFiles == "" {
+		return fmt.Errorf("no md files passed for update")
+	}
+
+	files := strings.Split(p.UpdateMdFiles, ",")
+	if len(files) < 1 {
+		return fmt.Errorf("invalid files list, filenames should be separated by ',' or only one passed")
+	}
+
+	for _, f := range files {
+		if err := b.writeBadgeToMd(f, cov); err != nil {
+			return fmt.Errorf("write badge to markdown[%s]: %w", f, err)
 		}
 	}
 

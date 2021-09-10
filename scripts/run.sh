@@ -12,4 +12,9 @@ echo "${SCRIPT_NAME} is running... "
 
 APP=coverbadger
 
-${BIN_DIR}/${APP} -coverage=$(gocov report ${COV_DIR}/full.json | tail -1 | awk '{if ($1 != "?") print $3; else print "0.0";}' | sed 's/\%//g') -md="README.md"
+COVERAGE=$(gocov report ${COV_DIR}/full.json | tail -1 | awk '{if ($1 != "?") print $3; else print "0.0";}' | sed 's/\%//g')
+
+${BIN_DIR}/${APP} \
+  --coverage=${COVERAGE} \
+  --md="README.md" \
+  -style=social

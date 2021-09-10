@@ -62,15 +62,31 @@ func TestGenerateBadgeBadgeURL(t *testing.T) {
 				cov: 100.1,
 			},
 			expected: expected{
+				wantErr: true,
+				url:     "",
+			},
+		},
+		{
+			name: "",
+			args: args{
+				cov: 100.00,
+			},
+			expected: expected{
 				wantErr: false,
-				url:     "https://img.shields.io/badge/coverage-100.1%25-brightgreen.png?longCache=true&style=flat",
+				url:     "https://img.shields.io/badge/coverage-100%25-brightgreen.png?longCache=true&style=flat",
 			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := coverageBadge.generateBadgeBadgeURL(tt.args.cov)
+			got, err := coverageBadge.generateBadgeBadgeURL(tt.args.cov)
+			if tt.expected.wantErr {
+				assert.Error(t, err)
+				return
+			}
+
+			assert.NoError(t, err)
 			assert.Equal(t, tt.expected.url, got)
 		})
 	}

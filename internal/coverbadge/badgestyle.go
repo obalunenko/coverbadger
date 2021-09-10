@@ -19,7 +19,7 @@ const (
 	badgeStyleSentinel // sentinel
 )
 
-var badgeStyleDict = func() map[string]badgeStyle {
+func badgeStyleDict() map[string]badgeStyle {
 	res := make(map[string]badgeStyle)
 
 	for i := badgeStyleUnknown; i < badgeStyleSentinel; i++ {
@@ -27,10 +27,10 @@ var badgeStyleDict = func() map[string]badgeStyle {
 	}
 
 	return res
-}()
+}
 
 func parseBadgeStyle(v string) (badgeStyle, error) {
-	style, ok := badgeStyleDict[v]
+	style, ok := badgeStyleDict()[v]
 	if !ok {
 		return badgeStyleUnknown, fmt.Errorf("invalid badge stle value")
 	}
@@ -38,8 +38,8 @@ func parseBadgeStyle(v string) (badgeStyle, error) {
 	return style, nil
 }
 
-func (b badgeStyle) IsValid() bool {
-	return b > badgeStyleUnknown && b < badgeStyleSentinel
+func (i badgeStyle) IsValid() bool {
+	return i > badgeStyleUnknown && i < badgeStyleSentinel
 }
 
 // BadgeStyleNames returns list of valid badgeStyle names.
