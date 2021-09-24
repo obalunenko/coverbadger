@@ -12,7 +12,7 @@ Generate coverage badge images for Markdown files using Go
 To install the executable (ensure your $PATH contains $GOPATH/bin):
 
 ```
-go install github.com/obalunenko/coverbadger
+go install github.com/obalunenko/coverbadger/cmd/coverbadger
 ```
 Or download from relases [![Latest release artifacts](https://img.shields.io/github/v/release/obalunenko/coverbadger)](https://github.com/obalunenko/coverbadger/releases/latest)
 
