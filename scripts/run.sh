@@ -17,4 +17,4 @@ COVERAGE=$(gocov report ${COV_DIR}/full.json | tail -1 | awk '{if ($1 != "?") pr
 ${BIN_DIR}/${APP} \
   --coverage=${COVERAGE} \
   --md="README.md" \
-  -style=social
+  -style=flat
