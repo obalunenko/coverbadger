@@ -13,10 +13,11 @@ APP=coverbadger
 
 echo "Building ${APP}..."
 
-COMMIT=$(git rev-parse HEAD)
-SHORTCOMMIT=$(git rev-parse --short HEAD)
-DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-VERSION=$(git describe --tags --always $(git rev-list --tags --max-count=1))
+COMMIT="$(git rev-parse HEAD)"
+SHORTCOMMIT="$(git rev-parse --short HEAD)"
+DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+VERSION="$(git describe --tags --always "$(git rev-list --tags --max-count=1)")"
+GOVERSION="$(go version | awk '{print $3;}')"
 
 if [ -z "${VERSION}" ] || [ "${VERSION}" = "${SHORTCOMMIT}" ]
  then
@@ -31,12 +32,13 @@ GO_BUILD_LDFLAGS="-s -w \
 -X ${BUILDINFO_VARS_PKG}.commit=${COMMIT} \
 -X ${BUILDINFO_VARS_PKG}.shortcommit=${SHORTCOMMIT} \
 -X ${BUILDINFO_VARS_PKG}.builddate=${DATE} \
--X ${BUILDINFO_VARS_PKG}.appname=${APP}"
+-X ${BUILDINFO_VARS_PKG}.appname=${APP} \
+-X ${BUILDINFO_VARS_PKG}.goversion=${GOVERSION}"
 
 GO_BUILD_PACKAGE="${REPO_ROOT}/cmd/${APP}"
 
-rm -rf ${BIN_OUT}
+rm -rf "${BIN_OUT}"
 
-go build -o ${BIN_OUT} -a -ldflags "${GO_BUILD_LDFLAGS}" "${GO_BUILD_PACKAGE}"
+go build -o "${BIN_OUT}" -a -ldflags "${GO_BUILD_LDFLAGS}" "${GO_BUILD_PACKAGE}"
 
 echo "Binary compiled at ${BIN_OUT}"
