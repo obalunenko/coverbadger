@@ -35,20 +35,27 @@ help:
 	{ lastLine = $$0 }' $(MAKEFILE_LIST)
 
 compile:
-	./scripts/compile.sh
+	./scripts/build/compile.sh
 .PHONY: build
 
-run: test-cover compile
-	./scripts/run.sh
-.PHONY: run
+## Test coverage report.
+test-cover:
+	${call colored, test-cover is running...}
+	./scripts/tests/coverage.sh
+.PHONY: test-cover
+
+## Open coverage report.
+open-cover-report: test-cover
+	./scripts/open-coverage-report.sh
+.PHONY: open-cover-report
+
+update-readme-cover: compile test-cover
+	./scripts/update-readme-coverage.sh
+.PHONY: update-readme-cover
 
 test:
-	./scripts/run-tests.sh
+	./scripts/tests/run.sh
 .PHONY: test
-
-test-cover:
-	./scripts/coverage.sh
-.PHONY: cover
 
 coverage:
 	make cover
@@ -62,13 +69,13 @@ sync-vendor:
 ## Fix imports sorting.
 imports:
 	${call colored, fix-imports is running...}
-	./scripts/fix-imports.sh
+	./scripts/style/fix-imports.sh
 .PHONY: imports
 
 ## Format code with go fmt.
 fmt:
 	${call colored, fmt is running...}
-	./scripts/fmt.sh
+	./scripts/style/fmt.sh
 .PHONY: fmt
 
 ## Format code and sort imports.
@@ -76,29 +83,29 @@ format-project: fmt imports
 .PHONY: format-project
 
 install-tools:
-	./scripts/install-vendored-tools.sh
+	./scripts/install/install-vendored-tools.sh
 .PHONY: install-tools
 
 ## vet project
 vet:
 	${call colored, vet is running...}
-	./scripts/run-vet.sh
+	./scripts/linting/run-vet.sh
 .PHONY: vet
 
 ## Run full linting
 lint-full:
-	./scripts/run-linters.sh
+	./scripts/linting/run-linters.sh
 .PHONY: lint-full
 
 ## Run linting for build pipeline
 lint-pipeline:
-	./scripts/run-linters-pipeline.sh
+	./scripts/linting/run-linters-pipeline.sh
 .PHONY: lint-pipeline
 
 ## recreate all generated code and swagger documentation.
 codegen:
 	${call colored, codegen is running...}
-	./scripts/go-generate.sh
+	./scripts/codegen/go-generate.sh
 .PHONY: codegen
 
 ## recreate all generated code and swagger documentation and format code.
@@ -107,16 +114,16 @@ generate: codegen format-project vet
 
 ## Release
 release:
-	./scripts/release.sh
+	./scripts/release/release.sh
 .PHONY: release
 
 ## Release local snapshot
 release-local-snapshot:
 	${call colored, release is running...}
-	./scripts/local-snapshot-release.sh
+	./scripts/release/local-snapshot-release.sh
 .PHONY: release-local-snapshot
 
 ## Issue new release.
 new-version: vet test compile
-	./scripts/new-version.sh
+	./scripts/release/new-version.sh
 .PHONY: new-release

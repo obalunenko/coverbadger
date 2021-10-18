@@ -47,9 +47,10 @@ type Repo struct {
 // also require separate authentication
 // e.g. Homebrew Tap, Scoop bucket.
 type RepoRef struct {
-	Owner string `yaml:",omitempty"`
-	Name  string `yaml:",omitempty"`
-	Token string `yaml:",omitempty"`
+	Owner  string `yaml:",omitempty"`
+	Name   string `yaml:",omitempty"`
+	Token  string `yaml:",omitempty"`
+	Branch string `yaml:",omitempty"`
 }
 
 // HomebrewDependency represents Homebrew dependency.
@@ -86,6 +87,21 @@ func (r Repo) String() string {
 		return ""
 	}
 	return r.Owner + "/" + r.Name
+}
+
+// GoFish contains the gofish section.
+type GoFish struct {
+	Name                  string       `yaml:",omitempty"`
+	Rig                   RepoRef      `yaml:",omitempty"`
+	CommitAuthor          CommitAuthor `yaml:"commit_author,omitempty"`
+	CommitMessageTemplate string       `yaml:"commit_msg_template,omitempty"`
+	Description           string       `yaml:",omitempty"`
+	Homepage              string       `yaml:",omitempty"`
+	License               string       `yaml:",omitempty"`
+	SkipUpload            string       `yaml:"skip_upload,omitempty"`
+	URLTemplate           string       `yaml:"url_template,omitempty"`
+	IDs                   []string     `yaml:"ids,omitempty"`
+	Goarm                 string       `yaml:"goarm,omitempty"`
 }
 
 // Homebrew contains the brew section.
@@ -201,7 +217,7 @@ type Build struct {
 	Binary          string         `yaml:",omitempty"`
 	Hooks           HookConfig     `yaml:",omitempty"`
 	Env             []string       `yaml:",omitempty"`
-	Lang            string         `yaml:",omitempty"`
+	Builder         string         `yaml:",omitempty"`
 	Asmflags        StringArray    `yaml:",omitempty"`
 	Gcflags         StringArray    `yaml:",omitempty"`
 	ModTimestamp    string         `yaml:"mod_timestamp,omitempty"`
@@ -299,6 +315,13 @@ func (f *File) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	}
 	*f = File(file)
 	return nil
+}
+
+// UniversalBinary setups macos universal binaries.
+type UniversalBinary struct {
+	ID           string `yaml:"id,omitempty"`
+	NameTemplate string `yaml:"name_template,omitempty"`
+	Replace      bool   `yaml:",omitempty"`
 }
 
 // Archive config used for the archive.
@@ -578,7 +601,8 @@ type Filters struct {
 type Changelog struct {
 	Filters Filters `yaml:",omitempty"`
 	Sort    string  `yaml:",omitempty"`
-	Skip    bool    `yaml:",omitempty"`
+	Skip    bool    `yaml:",omitempty"` // TODO(caarlos0): rename to Disable to match other pipes
+	Use     string  `yaml:",omitempty"`
 }
 
 // EnvFiles holds paths to files that contains environment variables
@@ -648,6 +672,7 @@ type Project struct {
 	Release         Release          `yaml:",omitempty"`
 	Milestones      []Milestone      `yaml:",omitempty"`
 	Brews           []Homebrew       `yaml:",omitempty"`
+	Rigs            []GoFish         `yaml:",omitempty"`
 	Scoop           Scoop            `yaml:",omitempty"`
 	Builds          []Build          `yaml:",omitempty"`
 	Archives        []Archive        `yaml:",omitempty"`
@@ -671,6 +696,8 @@ type Project struct {
 	GoMod           GoMod            `yaml:"gomod,omitempty"`
 	Announce        Announce         `yaml:"announce,omitempty"`
 
+	UniversalBinaries []UniversalBinary `yaml:"universal_binaries,omitempty"`
+
 	// this is a hack ¯\_(ツ)_/¯
 	SingleBuild Build `yaml:"build,omitempty"`
 
@@ -691,9 +718,15 @@ type GoMod struct {
 }
 
 type Announce struct {
-	Twitter Twitter `yaml:"twitter,omitempty"`
-	Reddit  Reddit  `yaml:"reddit,omitempty"`
-	Slack   Slack   `yaml:"slack,omitempty"`
+	Skip       string     `yaml:"skip,omitempty"`
+	Twitter    Twitter    `yaml:"twitter,omitempty"`
+	Reddit     Reddit     `yaml:"reddit,omitempty"`
+	Slack      Slack      `yaml:"slack,omitempty"`
+	Discord    Discord    `yaml:"discord,omitempty"`
+	Teams      Teams      `yaml:"teams,omitempty"`
+	SMTP       SMTP       `yaml:"smtp,omitempty"`
+	Mattermost Mattermost `yaml:"mattermost,omitempty"`
+	Telegram   Telegram   `yaml:"telegram,omitempty"`
 }
 
 type Twitter struct {
@@ -717,6 +750,51 @@ type Slack struct {
 	Username        string `yaml:"username,omitempty"`
 	IconEmoji       string `yaml:"icon_emoji,omitempty"`
 	IconURL         string `yaml:"icon_url,omitempty"`
+}
+
+type Discord struct {
+	Enabled         bool   `yaml:"enabled,omitempty"`
+	MessageTemplate string `yaml:"message_template,omitempty"`
+	Author          string `yaml:"author,omitempty"`
+	Color           string `yaml:"color,omitempty"`
+	IconURL         string `yaml:"icon_url,omitempty"`
+}
+
+type Teams struct {
+	Enabled         bool   `yaml:"enabled,omitempty"`
+	TitleTemplate   string `yaml:"title_template,omitempty"`
+	MessageTemplate string `yaml:"message_template,omitempty"`
+	Color           string `yaml:"color,omitempty"`
+	IconURL         string `yaml:"icon_url,omitempty"`
+}
+
+type Mattermost struct {
+	Enabled         bool   `yaml:"enabled,omitempty"`
+	MessageTemplate string `yaml:"message_template,omitempty"`
+	TitleTemplate   string `yaml:"title_template,omitempty"`
+	Color           string `yaml:"color,omitempty"`
+	Channel         string `yaml:"channel,omitempty"`
+	Username        string `yaml:"username,omitempty"`
+	IconEmoji       string `yaml:"icon_emoji,omitempty"`
+	IconURL         string `yaml:"icon_url,omitempty"`
+}
+
+type SMTP struct {
+	Enabled            bool     `yaml:"enabled,omitempty"`
+	Host               string   `yaml:"host,omitempty"`
+	Port               int      `yaml:"port,omitempty"`
+	Username           string   `yaml:"username,omitempty"`
+	From               string   `yaml:"from,omitempty"`
+	To                 []string `yaml:"to,omitempty"`
+	SubjectTemplate    string   `yaml:"subject_template,omitempty"`
+	BodyTemplate       string   `yaml:"body_template,omitempty"`
+	InsecureSkipVerify bool     `yaml:"insecure_skip_verify,omitempty"`
+}
+
+type Telegram struct {
+	Enabled         bool   `yaml:"enabled,omitempty"`
+	MessageTemplate string `yaml:"message_template,omitempty"`
+	ChatID          int64  `yaml:"chat_id,omitempty"`
 }
 
 // Load config file.
