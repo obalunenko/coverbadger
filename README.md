@@ -32,6 +32,10 @@ Manually set the coverage value (note: do not include %):
 
 `coverbadger -md="README.md,coverage.md" -coverage=95`
 
+## Example:
+
+[Example of usage](https://github.com/obalunenko/coverbadger/blob/master/scripts/update-readme-coverage.sh)
+
 
 ## Confused?
 
