@@ -46,6 +46,7 @@ const (
 	date            = "Date"
 	timestamp       = "Timestamp"
 	modulePath      = "ModulePath"
+	releaseNotes    = "ReleaseNotes"
 
 	// artifact-only keys.
 	osKey        = "Os"
@@ -90,6 +91,7 @@ func New(ctx *context.Context) *Template {
 			patch:           ctx.Semver.Patch,
 			prerelease:      ctx.Semver.Prerelease,
 			isSnapshot:      ctx.Snapshot,
+			releaseNotes:    ctx.ReleaseNotes,
 		},
 	}
 }
@@ -146,8 +148,10 @@ func buildOptsToFields(opts build.Options) Fields {
 		ext:    opts.Ext,
 		name:   opts.Name,
 		path:   opts.Path,
-		osKey:  opts.Os,
-		arch:   opts.Arch,
+		osKey:  opts.Goos,
+		arch:   opts.Goarch,
+		arm:    opts.Goarm,
+		mips:   opts.Gomips,
 	}
 }
 
