@@ -1144,6 +1144,7 @@ golang.org/x/time/rate
 ## explicit; go 1.17
 golang.org/x/tools/cmd/cover
 golang.org/x/tools/cmd/goimports
+golang.org/x/tools/cmd/stringer
 golang.org/x/tools/cover
 golang.org/x/tools/go/analysis
 golang.org/x/tools/go/analysis/passes/asmdecl
