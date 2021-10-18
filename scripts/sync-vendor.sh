@@ -12,7 +12,7 @@ echo "${SCRIPT_NAME} is running... "
 go env -w GOPROXY=https://goproxy.io,https://proxy.golang.org
 
 sync_vendor() {
-  go mod tidy -v
+  go mod tidy -compat=1.17 -v
   go mod vendor
   go mod verify
 }

@@ -2,6 +2,12 @@
 
 set -Eeuo pipefail
 
+SCRIPT_DIR="$(dirname "$0")"
+REPO_ROOT="$(cd "${SCRIPT_DIR}" && git rev-parse --show-toplevel)"
+SCRIPTS_DIR="${REPO_ROOT}/scripts"
+
+source "${SCRIPTS_DIR}/helpers-source.sh"
+
 function vet() {
   echo "vet project..."
   declare -a vet_errs=$(go vet $(go list ./...) 2>&1 >/dev/null)
@@ -27,6 +33,9 @@ function vet() {
 
 function fmt() {
   echo "fmt lint..."
+
+  checkInstalled 'gofmt'
+
   declare -a fmts=$(gofmt -s -l $(find . -type f -name '*.go' | grep -v 'vendor' | grep -v '.git'))
 
   if [[ ${fmts} ]]; then
@@ -46,11 +55,8 @@ function fmt() {
 
 function go-lint() {
   echo "golint..."
-  if ! command -v golint; then
-    printf "Cannot check golint, please run:
-          go get -u -v golang.org/x/lint/golint/... \n"
-    exit 1
-  fi
+
+  checkInstalled 'golint'
 
   declare -a lints=$(golint $(go list ./...)) ## its a hack to not lint generated code
   if [[ ${lints} ]]; then
@@ -71,11 +77,8 @@ function go-lint() {
 
 function go-group() {
   echo "gogroup..."
-  if ! command -v gogroup; then
-    printf "Cannot check gogroup, please run:
-        make install-tools \n"
-    exit 1
-  fi
+
+  checkInstalled 'gogroup'
 
   declare -a lints=$(gogroup -order std,other,prefix=github.com/obalunenko/ $(find . -type f -name "*.go" | grep -v "vendor/"))
 
@@ -97,11 +100,8 @@ function go-group() {
 
 function golangci() {
   echo "golangci-lint linter running..."
-  if ! command -v golangci-lint; then
-    printf "Cannot check golangci-lint, please run:
-          make install-tools \n"
-    exit 1
-  fi
+
+  checkInstalled 'golangci-lint'
 
   golangci-lint run --out-format=colored-line-number ./...
 
@@ -110,11 +110,8 @@ function golangci() {
 
 function golangci-ci_execute() {
   echo "golangci-lint-ci_execute linter running..."
-  if ! command -v golangci-lint; then
-    printf "Cannot check golangci-lint, please run:
-            make install-tools \n"
-    exit 1
-  fi
+
+  checkInstalled 'golangci-lint'
 
   golangci-lint run ./... >linters.out
 
