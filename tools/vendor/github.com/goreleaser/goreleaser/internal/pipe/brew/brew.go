@@ -15,6 +15,7 @@ import (
 	"github.com/apex/log"
 	"github.com/goreleaser/goreleaser/internal/artifact"
 	"github.com/goreleaser/goreleaser/internal/client"
+	"github.com/goreleaser/goreleaser/internal/commitauthor"
 	"github.com/goreleaser/goreleaser/internal/pipe"
 	"github.com/goreleaser/goreleaser/internal/tmpl"
 	"github.com/goreleaser/goreleaser/pkg/config"
@@ -23,12 +24,14 @@ import (
 
 const brewConfigExtra = "BrewConfig"
 
-// ErrNoArchivesFound happens when 0 archives are found.
-var ErrNoArchivesFound = errors.New("no linux/macos archives found")
+var (
+	// ErrNoArchivesFound happens when 0 archives are found.
+	ErrNoArchivesFound = errors.New("no linux/macos archives found")
 
-// ErrMultipleArchivesSameOS happens when the config yields multiple archives
-// for linux or windows.
-var ErrMultipleArchivesSameOS = errors.New("one tap can handle only archive of an OS/Arch combination. Consider using ids in the brew section")
+	// ErrMultipleArchivesSameOS happens when the config yields multiple archives
+	// for linux or windows.
+	ErrMultipleArchivesSameOS = errors.New("one tap can handle only archive of an OS/Arch combination. Consider using ids in the brew section")
+)
 
 // Pipe for brew deployment.
 type Pipe struct{}
@@ -40,12 +43,8 @@ func (Pipe) Default(ctx *context.Context) error {
 	for i := range ctx.Config.Brews {
 		brew := &ctx.Config.Brews[i]
 
-		if brew.CommitAuthor.Name == "" {
-			brew.CommitAuthor.Name = "goreleaserbot"
-		}
-		if brew.CommitAuthor.Email == "" {
-			brew.CommitAuthor.Email = "goreleaser@carlosbecker.com"
-		}
+		brew.CommitAuthor = commitauthor.Default(brew.CommitAuthor)
+
 		if brew.CommitMessageTemplate == "" {
 			brew.CommitMessageTemplate = "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
 		}
@@ -133,12 +132,17 @@ func doPublish(ctx *context.Context, formula *artifact.Artifact, cl client.Clien
 		return err
 	}
 
+	author, err := commitauthor.Get(ctx, brew.CommitAuthor)
+	if err != nil {
+		return err
+	}
+
 	content, err := os.ReadFile(formula.Path)
 	if err != nil {
 		return err
 	}
 
-	return cl.CreateFile(ctx, brew.CommitAuthor, repo, content, gpath, msg)
+	return cl.CreateFile(ctx, author, repo, content, gpath, msg)
 }
 
 func doRun(ctx *context.Context, brew config.Homebrew, cl client.Client) error {
@@ -152,7 +156,6 @@ func doRun(ctx *context.Context, brew config.Homebrew, cl client.Client) error {
 			artifact.ByGoos("darwin"),
 			artifact.ByGoos("linux"),
 		),
-		artifact.ByFormats("zip", "tar.gz"),
 		artifact.Or(
 			artifact.ByGoarch("amd64"),
 			artifact.ByGoarch("arm64"),
@@ -162,7 +165,14 @@ func doRun(ctx *context.Context, brew config.Homebrew, cl client.Client) error {
 				artifact.ByGoarm(brew.Goarm),
 			),
 		),
-		artifact.ByType(artifact.UploadableArchive),
+		artifact.Or(
+			artifact.And(
+				artifact.ByFormats("zip", "tar.gz"),
+				artifact.ByType(artifact.UploadableArchive),
+			),
+			artifact.ByType(artifact.UploadableBinary),
+		),
+		artifact.OnlyReplacingUnibins,
 	}
 	if len(brew.IDs) > 0 {
 		filters = append(filters, artifact.ByIDs(brew.IDs...))
@@ -271,22 +281,35 @@ func doBuildFormula(ctx *context.Context, data templateData) (string, error) {
 	return out.String(), nil
 }
 
-func installs(cfg config.Homebrew, artifacts []*artifact.Artifact) []string {
+func installs(cfg config.Homebrew, art *artifact.Artifact) []string {
 	if cfg.Install != "" {
 		return split(cfg.Install)
 	}
-	install := []string{}
-	bins := map[string]bool{}
-	for _, a := range artifacts {
-		for _, bin := range a.ExtraOr("Binaries", []string{}).([]string) {
-			if !bins[bin] {
-				install = append(install, fmt.Sprintf("bin.install %q", bin))
-			}
-			bins[bin] = true
+
+	install := map[string]bool{}
+	switch art.Type {
+	case artifact.UploadableBinary:
+		name := art.Name
+		bin := art.ExtraOr(artifact.ExtraBinary, art.Name).(string)
+		install[fmt.Sprintf("bin.install %q => %q", name, bin)] = true
+	case artifact.UploadableArchive:
+		for _, bin := range art.ExtraOr(artifact.ExtraBinaries, []string{}).([]string) {
+			install[fmt.Sprintf("bin.install %q", bin)] = true
 		}
 	}
-	log.Warnf("guessing install to be `%s`", strings.Join(install, " "))
-	return install
+
+	result := keys(install)
+	sort.Strings(result)
+	log.Warnf("guessing install to be %q", strings.Join(result, ", "))
+	return result
+}
+
+func keys(m map[string]bool) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return keys
 }
 
 func dataFor(ctx *context.Context, cfg config.Homebrew, cl client.Client, artifacts []*artifact.Artifact) (templateData, error) {
@@ -300,7 +323,6 @@ func dataFor(ctx *context.Context, cfg config.Homebrew, cl client.Client, artifa
 		Dependencies:  cfg.Dependencies,
 		Conflicts:     cfg.Conflicts,
 		Plist:         cfg.Plist,
-		Install:       installs(cfg, artifacts),
 		PostInstall:   cfg.PostInstall,
 		Tests:         split(cfg.Test),
 		CustomRequire: cfg.CustomRequire,
@@ -308,8 +330,8 @@ func dataFor(ctx *context.Context, cfg config.Homebrew, cl client.Client, artifa
 	}
 
 	counts := map[string]int{}
-	for _, artifact := range artifacts {
-		sum, err := artifact.Checksum("sha256")
+	for _, art := range artifacts {
+		sum, err := art.Checksum("sha256")
 		if err != nil {
 			return result, err
 		}
@@ -322,7 +344,7 @@ func dataFor(ctx *context.Context, cfg config.Homebrew, cl client.Client, artifa
 			cfg.URLTemplate = url
 		}
 
-		url, err := tmpl.New(ctx).WithArtifact(artifact, map[string]string{}).Apply(cfg.URLTemplate)
+		url, err := tmpl.New(ctx).WithArtifact(art, map[string]string{}).Apply(cfg.URLTemplate)
 		if err != nil {
 			return result, err
 		}
@@ -330,9 +352,10 @@ func dataFor(ctx *context.Context, cfg config.Homebrew, cl client.Client, artifa
 		pkg := releasePackage{
 			DownloadURL:      url,
 			SHA256:           sum,
-			OS:               artifact.Goos,
-			Arch:             artifact.Goarch,
+			OS:               art.Goos,
+			Arch:             art.Goarch,
 			DownloadStrategy: cfg.DownloadStrategy,
+			Install:          installs(cfg, art),
 		}
 
 		counts[pkg.OS+pkg.Arch]++
