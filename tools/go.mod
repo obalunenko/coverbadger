@@ -8,7 +8,7 @@ require (
 	github.com/goreleaser/goreleaser v1.7.0
 	github.com/matm/gocov-html v0.0.0-20200509184451-71874e2e203b
 	golang.org/x/tools v0.1.10
-	gotest.tools/gotestsum v1.7.0
+	gotest.tools/gotestsum v1.8.0
 )
 
 require (
