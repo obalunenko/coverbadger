@@ -6,9 +6,8 @@ import (
 	"os"
 	"text/tabwriter"
 
-	logging "github.com/sirupsen/logrus"
-
 	"github.com/obalunenko/version"
+	logging "github.com/sirupsen/logrus"
 )
 
 func printVersion(_ context.Context) {
