@@ -1,6 +1,7 @@
 package coverbadge
 
 import (
+	"context"
 	"path/filepath"
 	"testing"
 
@@ -16,7 +17,7 @@ var coverageBadge = badge{
 func TestWriteBadgeToMd(t *testing.T) {
 	mdpath := filepath.Join("testdata", "coverage_test.md")
 
-	err := coverageBadge.writeBadgeToMd(mdpath, 22)
+	err := coverageBadge.writeBadgeToMd(context.Background(), mdpath, 22)
 	require.NoError(t, err)
 }
 
