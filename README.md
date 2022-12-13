@@ -3,7 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/obalunenko/coverbadger)](https://goreportcard.com/report/github.com/obalunenko/coverbadger)
 [![Latest release artifacts](https://img.shields.io/github/v/release/obalunenko/coverbadger)](https://github.com/obalunenko/coverbadger/releases/latest)
 [![License](https://img.shields.io/github/license/obalunenko/coverbadger)](/LICENSE)
-[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=obalunenko_coverbadger)](https://sonarcloud.io/summary/new_code?id=obalunenko_coverbadger)
+[![Quality gate](https://sonarcloud.io/api/project_badges/measure?project=obalunenko_advent-of-code&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=obalunenko_coverbadger)
 ![coverbadger-tag-do-not-edit](https://img.shields.io/badge/coverage-59.68%25-brightgreen?longCache=true&style=flat)
 
 # coverbadger
