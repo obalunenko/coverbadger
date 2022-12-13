@@ -21,7 +21,7 @@ if [[ ${COVERAGE} == "NaN" ]]; then
 fi
 
 coverbadger \
-  --coverage=${COVERAGE} \
+  --coverage="${COVERAGE}" \
   --md="${REPO_ROOT}/README.md" \
   --style=flat
 
