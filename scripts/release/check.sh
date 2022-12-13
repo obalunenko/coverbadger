@@ -30,6 +30,7 @@ if [ -z "${VERSION}" ] || [ "${VERSION}" = "${SHORTCOMMIT}" ]
   VERSION="v0.0.0"
 fi
 
+
 VERSION="${VERSION}-local"
 
 
@@ -42,4 +43,6 @@ export GO_BUILD_LDFLAGS="-s -w \
 -X ${BUILDINFO_VARS_PKG}.appname=${APP} \
 -X ${BUILDINFO_VARS_PKG}.goversion=${GOVERSION}"
 
-goreleaser --snapshot --skip-publish --rm-dist
+goreleaser check
+
+goreleaser build --rm-dist --single-target --snapshot

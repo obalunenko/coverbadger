@@ -4,19 +4,19 @@ set -eu
 
 SCRIPT_NAME="$(basename "$0")"
 SCRIPT_DIR="$(dirname "$0")"
-REPO_ROOT="$(cd ${SCRIPT_DIR} && git rev-parse --show-toplevel)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}" && git rev-parse --show-toplevel)"
 BIN_DIR=${REPO_ROOT}/bin
 
 echo "${SCRIPT_NAME} is running... "
 
-APP=coverbadger
+APP=${APP_NAME}
 
 echo "Building ${APP}..."
 
 COMMIT="$(git rev-parse HEAD)"
 SHORTCOMMIT="$(git rev-parse --short HEAD)"
 DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-VERSION="$(git describe --tags --always "$(git rev-list --tags --max-count=1)")"
+VERSION="$(git tag --sort=committerdate | tail -1)"
 GOVERSION="$(go version | awk '{print $3;}')"
 
 if [ -z "${VERSION}" ] || [ "${VERSION}" = "${SHORTCOMMIT}" ]
@@ -24,7 +24,7 @@ if [ -z "${VERSION}" ] || [ "${VERSION}" = "${SHORTCOMMIT}" ]
   VERSION="v0.0.0"
 fi
 
-BIN_OUT=${BIN_DIR}/${APP}
+BIN_OUT="${BIN_DIR}/${APP}"
 
 BUILDINFO_VARS_PKG=github.com/obalunenko/version
 GO_BUILD_LDFLAGS="-s -w \

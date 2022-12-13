@@ -19,7 +19,6 @@ export GO111MODULE=on
 rm -rf "${COVER_DIR}"
 mkdir -p "${COVER_DIR}"
 
-go test --count=1 -tags=integration_test -coverprofile "${COVER_DIR}/integration.cov" -covermode=atomic ./...
 go test --count=1 -coverprofile "${COVER_DIR}/unit.cov" -covermode=atomic ./...
 
 {
@@ -28,3 +27,7 @@ go test --count=1 -coverprofile "${COVER_DIR}/unit.cov" -covermode=atomic ./...
 } >>"${COVER_DIR}/full.cov"
 
 gocov convert "${COVER_DIR}/full.cov" >"${COVER_DIR}/full.json"
+
+checkInstalled 'gocov-html'
+
+gocov-html "${COVER_DIR}/full.json" >"${COVER_DIR}/full.html"
