@@ -2,7 +2,7 @@ version: '3'
 
 services:
   tools:
-    image: olegbalunenko/go-tools:${GOTOOLS_IMAGE_TAG:-latest}
+    image: ghcr.io/obalunenko/go-tools:${GOTOOLS_IMAGE_TAG:-latest}
     volumes:
       - ../../:/app/
   fix-imports:
