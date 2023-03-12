@@ -1,6 +1,7 @@
 name: Go [lint, test]
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - 'master'
@@ -16,6 +17,7 @@ on:
       - '!**.*md'
       - '.github/workflows/**'
       - '!.github/workflows/readme-stars.yml'
+      - 'deployments/docker-compose/go-tools-docker-compose.yml'
   pull_request:
     types: [ opened, synchronize, reopened ]
     branches:
@@ -160,7 +162,7 @@ jobs:
         run: |
           make vet
         shell: bash
-      
+
       - name: Set up cache
         uses: actions/cache@v3
         env:
@@ -185,7 +187,7 @@ jobs:
         shell: bash
 
   reports:
-    needs: [testing, linting, build]
+    needs: [ testing, linting, build ]
     strategy:
       fail-fast: true
       max-parallel: 1
@@ -223,24 +225,19 @@ jobs:
 
       - name: Install tools
         run: |
-           make install-tools
+          make install-tools
         shell: bash
 
-      - name: Prepare test coverage
+      - name: Prepare test coverage and reports
         run: |
-          make test-cover
-        shell: bash
-      
-      - name: Tests report
-        run: |
-          make test-sonar-report
+          make prepare-cover-report
         shell: bash
 
       - name: Prepare lint report
         run: |
           make lint-sonar
         shell: bash
-          
+
       - name: Cover report upload
         if: success()
         run: |
@@ -248,7 +245,7 @@ jobs:
         shell: bash
 
       - name: SonarCloud report upload
-        uses: sonarsource/sonarcloud-github-action@v1.8
+        uses: sonarsource/sonarcloud-github-action@v1.9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

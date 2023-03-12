@@ -156,7 +156,7 @@ jobs:
         shell: bash
 
   release:
-    needs: [build, regression_test, linting]
+    needs: [ build, regression_test, linting ]
     strategy:
       fail-fast: false
       max-parallel: 1
