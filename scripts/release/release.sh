@@ -23,11 +23,10 @@ git fetch --tags -f
 COMMIT="$(git rev-parse HEAD)"
 SHORTCOMMIT="$(git rev-parse --short HEAD)"
 DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-VERSION="$(git tag --sort=committerdate | tail -1)"
+VERSION="$(git tag | sort -V | tail -1)"
 GOVERSION="$(go version | awk '{print $3;}')"
 
-if [ -z "${VERSION}" ] || [ "${VERSION}" = "${SHORTCOMMIT}" ]
- then
+if [ -z "${VERSION}" ] || [ "${VERSION}" = "${SHORTCOMMIT}" ]; then
   VERSION="v0.0.0"
 fi
 
