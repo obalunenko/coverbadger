@@ -67,7 +67,6 @@ archives:
   - id: cli
     builds:
       - cli
-    rlcp: true
     format: tar.gz
     wrap_in_directory: true
     format_overrides:
